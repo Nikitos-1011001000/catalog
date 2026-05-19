@@ -1,6 +1,5 @@
 from django.shortcuts import render
 from django.contrib import messages
-from .forms import ContactForm
 
 def home(request):
     return render(request, 'catalog/home.html')

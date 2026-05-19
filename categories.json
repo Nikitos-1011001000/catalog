@@ -1,0 +1,18 @@
+[
+{
+  "model": "catalog.category",
+  "pk": 1,
+  "fields": {
+    "name": "Books",
+    "description": "Books category"
+  }
+},
+{
+  "model": "catalog.category",
+  "pk": 2,
+  "fields": {
+    "name": "Games",
+    "description": "Games category"
+  }
+}
+]
