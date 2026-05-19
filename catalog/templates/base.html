@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Catalog{% endblock %}</title>
+</head>
+<body>
+  {% include 'catalog/includes/main_menu.html' %}
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer>
+    <p>© Catalog</p>
+  </footer>
+</body>
+</html>

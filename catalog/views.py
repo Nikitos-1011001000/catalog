@@ -1,5 +1,8 @@
 from django.shortcuts import render
 from django.contrib import messages
+from django.views.generic import DetailView
+from django.views.generic import ListView
+from .models import Product
 
 def home(request):
     return render(request, 'catalog/home.html')
@@ -17,3 +20,13 @@ def contacts(request):
     else:
         form = ContactForm()
     return render(request, 'catalog/contacts.html', {'form': form})
+
+class ProductDetailView(DetailView):
+    model = Product
+    template_name = 'catalog/product_detail.html'
+    context_object_name = 'product'
+
+class ProductListView(ListView):
+    model = Product
+    template_name = 'catalog/product_list.html'
+    context_object_name = 'products'

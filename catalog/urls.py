@@ -1,11 +1,7 @@
 from django.urls import path
 from . import views
-
-app_name = 'catalog'
+from .views import ProductDetailView
 
 urlpatterns = [
-    # Здесь будут ваши URL-паттерны для приложения catalog
-    # Пример:
-    # path('', views.index, name='index'),
-    # path('products/', views.product_list, name='product_list'),
+    path('products/<int:pk>/', ProductDetailView.as_view(), name='product_detail'),
 ]
