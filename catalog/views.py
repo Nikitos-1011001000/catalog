@@ -1,36 +1,24 @@
-from django.shortcuts import render
 from django.contrib import messages
-from django.views.generic import DetailView, CreateView, ListView
-from .models import Product
-from .forms import ProductForm
 from django.urls import reverse_lazy
+from django.views.generic import DetailView, CreateView, ListView, TemplateView
 
-def home(request):
-    return render(request, 'catalog/home.html')
+from .forms import ContactForm
+from .models import Product
 
-def contacts(request):
-    return render(request, 'catalog/contacts.html')
 
-def contacts(request):
-    if request.method == 'POST':
-        form = ContactForm(request.POST)
-        if form.is_valid():
-            # Здесь сохраните или отправьте
-            messages.success(request, 'Спасибо! Сообщение отправлено.')
-            return render(request, 'catalog/contacts.html')
-    else:
-        form = ContactForm()
-    return render(request, 'catalog/contacts.html', {'form': form})
+class HomeView(TemplateView):
+    template_name = 'catalog/home.html'
 
-class ProductDetailView(DetailView):
-    model = Product
-    template_name = 'catalog/product_detail.html'
-    context_object_name = 'product'
 
-class ProductListView(ListView):
-    model = Product
-    template_name = 'catalog/product_list.html'
-    context_object_name = 'products'
+class ContactsView(FormView):
+    template_name = 'catalog/contacts.html'
+    form_class = ContactForm
+    success_url = reverse_lazy('contacts')
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Спасибо! Сообщение отправлено.')
+        return super().form_valid(form)
+
 
 class ProductListView(ListView):
     model = Product
@@ -38,10 +26,12 @@ class ProductListView(ListView):
     context_object_name = 'products'
     paginate_by = 10
 
+
 class ProductDetailView(DetailView):
     model = Product
     template_name = 'catalog/product_detail.html'
     context_object_name = 'product'
+
 
 class ProductCreateView(CreateView):
     model = Product
