@@ -1,9 +1,10 @@
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.views.generic import DetailView, CreateView, ListView, TemplateView
-
-from .forms import ContactForm
+from django.views.generic.edit import FormView
+from .forms import ProductForm, ContactForm
 from .models import Product
+from django.shortcuts import render
 
 
 class HomeView(TemplateView):
@@ -38,3 +39,18 @@ class ProductCreateView(CreateView):
     form_class = ProductForm
     template_name = 'catalog/product_form.html'
     success_url = reverse_lazy('product_list')
+
+def add_forms(request):
+    """Форма для добавления нового товара"""
+    if request.method == 'POST':
+        form = ProductForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('catalog:product_list')  # перенаправление на список товаров
+    else:
+        form = ProductForm()
+
+    context = {
+        'form': form,
+    }
+    return render(request, 'catalog/add_forms.html', context)
