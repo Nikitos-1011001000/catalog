@@ -8,6 +8,20 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
+AUTH_USER_MODEL = 'users.CustomUser'
+
+LOGIN_URL = 'users:login'  # или '/login/'
+LOGIN_REDIRECT_URL = 'home'  # куда перенаправлять после входа
+LOGOUT_REDIRECT_URL = 'home'  # куда после выхода
+
+# Настройки для отправки email
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # или ваш SMTP-сервер
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'your-email@gmail.com'
+EMAIL_HOST_PASSWORD = 'your-password'
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -17,6 +31,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'catalog.apps.CatalogConfig',
     'django_extensions',
+    'users',
     'blog',
 ]
 

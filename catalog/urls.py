@@ -1,12 +1,13 @@
 from django.contrib import admin
 from django.urls import path, include
+from . import views
 from .views import (
     ProductListView,
     ProductDetailView,
     ProductCreateView,
     HomeView,
     ContactsView,
-    add_forms  # импортируем функцию
+    AddFormsView  # импортируем функцию
 )
 
 app_name = 'catalog'
@@ -16,7 +17,6 @@ urlpatterns = [
     path('contacts/', ContactsView.as_view(), name='contacts'),
     path('products/', ProductListView.as_view(), name='product_list'),
     path('products/<int:pk>/', ProductDetailView.as_view(), name='product_detail'),
-    path('products/create/', ProductCreateView.as_view(), name='product_create'),
-    # Новый маршрут для add_forms:
-    path('add/', add_forms, name='add_forms'),  # теперь он здесь
+    path('products/create/', views.ProductCreateView.as_view(), name='product_create'),
+    path('add/', views.AddFormsView.as_view(), name='add_forms'),  # теперь он здесь
 ]

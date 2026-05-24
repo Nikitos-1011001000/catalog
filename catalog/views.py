@@ -1,10 +1,18 @@
 from django.contrib import messages
 from django.urls import reverse_lazy
-from django.views.generic import DetailView, CreateView, ListView, TemplateView
+from django.views.generic import (
+    ListView,
+    DetailView,
+    TemplateView,
+    CreateView,
+    UpdateView,
+    DeleteView,  # добавьте эту строку
+)
 from django.views.generic.edit import FormView
 from .forms import ProductForm, ContactForm
 from .models import Product
 from django.shortcuts import render
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 class HomeView(TemplateView):
@@ -34,23 +42,40 @@ class ProductDetailView(DetailView):
     context_object_name = 'product'
 
 
-class ProductCreateView(CreateView):
+class ProductCreateView(LoginRequiredMixin, CreateView):
     model = Product
     form_class = ProductForm
     template_name = 'catalog/product_form.html'
+    login_url = '/login/'  # URL страницы входа
+    redirect_field_name = 'home'
     success_url = reverse_lazy('product_list')
 
-def add_forms(request):
-    """Форма для добавления нового товара"""
-    if request.method == 'POST':
-        form = ProductForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('catalog:product_list')  # перенаправление на список товаров
-    else:
-        form = ProductForm()
+class AddFormsView(LoginRequiredMixin, CreateView):
+    model = Product
+    form_class = ProductForm
+    template_name = 'catalog/add_forms.html'  # укажите ваш шаблон
+    login_url = 'users:login'  # URL страницы входа
+    redirect_field_name = 'next'  # параметр для перенаправления после входа
+    success_url = reverse_lazy('catalog:product_list')
 
-    context = {
-        'form': form,
-    }
-    return render(request, 'catalog/add_forms.html', context)
+    def form_valid(self, form):
+        # Добавляем сообщение об успешном добавлении товара
+        messages.success(self.request, 'Товар успешно добавлен!')
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        # Можно добавить обработку ошибок
+        messages.error(self.request, 'Ошибка при добавлении товара. Проверьте данные.')
+        return self.render_to_response(self.get_context_data(form=form))
+
+class ProductCreateView(LoginRequiredMixin, CreateView):
+    login_url = '/accounts/login/'  # URL для перенаправления
+    redirect_field_name = 'next'
+
+class ProductUpdateView(LoginRequiredMixin, UpdateView):
+    login_url = '/accounts/login/'
+    redirect_field_name = 'next'
+
+class ProductDeleteView(LoginRequiredMixin, DeleteView):
+    login_url = '/accounts/login/'
+    redirect_field_name = 'next'
