@@ -7,7 +7,9 @@ from .views import (
     ProductCreateView,
     HomeView,
     ContactsView,
-    AddFormsView  # импортируем функцию
+    AddFormsView,
+    ProductUpdateView,
+    ProductDeleteView,
 )
 
 app_name = 'catalog'
@@ -18,5 +20,7 @@ urlpatterns = [
     path('products/', ProductListView.as_view(), name='product_list'),
     path('products/<int:pk>/', ProductDetailView.as_view(), name='product_detail'),
     path('products/create/', views.ProductCreateView.as_view(), name='product_create'),
-    path('add/', views.AddFormsView.as_view(), name='add_forms'),  # теперь он здесь
+    path('add/', views.AddFormsView.as_view(), name='add_forms'),
+    path('product/<int:pk>/edit/', ProductUpdateView.as_view(), name='product_edit'),
+    path('product/<int:pk>/delete/', ProductDeleteView.as_view(), name='product_delete'),
 ]

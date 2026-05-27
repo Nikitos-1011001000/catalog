@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.http import HttpResponseForbidden
 from django.urls import reverse_lazy
 from django.views.generic import (
     ListView,
@@ -6,14 +7,29 @@ from django.views.generic import (
     TemplateView,
     CreateView,
     UpdateView,
-    DeleteView,  # добавьте эту строку
+    DeleteView,
 )
 from django.views.generic.edit import FormView
-from .forms import ProductForm, ContactForm
-from .models import Product
-from django.shortcuts import render
 from django.contrib.auth.mixins import LoginRequiredMixin
 
+from .forms import ProductForm, ContactForm
+from .models import Product
+
+class AddFormsView(LoginRequiredMixin, CreateView):
+    model = Product
+    form_class = ProductForm
+    template_name = 'catalog/add_forms.html'
+    login_url = 'users:login'
+    redirect_field_name = 'next'
+    success_url = reverse_lazy('catalog:product_list')
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Товар успешно добавлен!')
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, 'Ошибка при добавлении товара. Проверьте данные.')
+        return self.render_to_response(self.get_context_data(form=form))
 
 class HomeView(TemplateView):
     template_name = 'catalog/home.html'
@@ -46,36 +62,44 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
     model = Product
     form_class = ProductForm
     template_name = 'catalog/product_form.html'
-    login_url = '/login/'  # URL страницы входа
-    redirect_field_name = 'home'
-    success_url = reverse_lazy('product_list')
-
-class AddFormsView(LoginRequiredMixin, CreateView):
-    model = Product
-    form_class = ProductForm
-    template_name = 'catalog/add_forms.html'  # укажите ваш шаблон
-    login_url = 'users:login'  # URL страницы входа
-    redirect_field_name = 'next'  # параметр для перенаправления после входа
     success_url = reverse_lazy('catalog:product_list')
+    login_url = '/accounts/login/'
+    redirect_field_name = 'next'
 
     def form_valid(self, form):
-        # Добавляем сообщение об успешном добавлении товара
+        form.instance.owner = self.request.user
         messages.success(self.request, 'Товар успешно добавлен!')
         return super().form_valid(form)
 
-    def form_invalid(self, form):
-        # Можно добавить обработку ошибок
-        messages.error(self.request, 'Ошибка при добавлении товара. Проверьте данные.')
-        return self.render_to_response(self.get_context_data(form=form))
-
-class ProductCreateView(LoginRequiredMixin, CreateView):
-    login_url = '/accounts/login/'  # URL для перенаправления
-    redirect_field_name = 'next'
 
 class ProductUpdateView(LoginRequiredMixin, UpdateView):
+    model = Product
+    form_class = ProductForm
+    template_name = 'catalog/product_form.html'
+    success_url = reverse_lazy('catalog:product_list')
     login_url = '/accounts/login/'
     redirect_field_name = 'next'
 
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if obj.owner != request.user:
+            return HttpResponseForbidden()
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Товар успешно обновлён!')
+        return super().form_valid(form)
+
+
 class ProductDeleteView(LoginRequiredMixin, DeleteView):
+    model = Product
+    template_name = 'catalog/product_confirm_delete.html'
+    success_url = reverse_lazy('catalog:product_list')
     login_url = '/accounts/login/'
     redirect_field_name = 'next'
+
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if obj.owner == request.user or request.user.has_perm('catalog.delete_product'):
+            return super().dispatch(request, *args, **kwargs)
+        return HttpResponseForbidden()
