@@ -11,9 +11,18 @@ from django.views.generic import (
 )
 from django.views.generic.edit import FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
-
+from django.core.cache import cache
 from .forms import ProductForm, ContactForm
 from .models import Product
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
+
+
+@method_decorator(cache_page(60 * 5), name='dispatch')
+class ProductDetailView(DetailView):
+    model = Product
+    template_name = 'catalog/product_detail.html'
+    context_object_name = 'product'
 
 class AddFormsView(LoginRequiredMixin, CreateView):
     model = Product
@@ -44,13 +53,19 @@ class ContactsView(FormView):
         messages.success(self.request, 'Спасибо! Сообщение отправлено.')
         return super().form_valid(form)
 
-
 class ProductListView(ListView):
     model = Product
     template_name = 'catalog/product_list.html'
     context_object_name = 'products'
     paginate_by = 10
 
+    def get_queryset(self):
+        cache_key = 'product_list'
+        products = cache.get(cache_key)
+        if products is None:
+            products = list(Product.objects.all())
+            cache.set(cache_key, products, 60 * 5)
+        return products
 
 class ProductDetailView(DetailView):
     model = Product
@@ -103,3 +118,12 @@ class ProductDeleteView(LoginRequiredMixin, DeleteView):
         if obj.owner == request.user or request.user.has_perm('catalog.delete_product'):
             return super().dispatch(request, *args, **kwargs)
         return HttpResponseForbidden()
+
+class ProductsByCategoryView(ListView):
+    model = Product
+    template_name = 'catalog/products_by_category.html'
+    context_object_name = 'products'
+
+    def get_queryset(self):
+        from .services import get_products_by_category
+        return get_products_by_category(self.kwargs['category_id'])
