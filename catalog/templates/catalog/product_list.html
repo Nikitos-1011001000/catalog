@@ -1,0 +1,46 @@
+{% extends 'catalog/base.html' %}
+
+{% block content %}
+<h1>Товары</h1>
+
+<a href="{% url 'catalog:add_forms' %}" class="btn btn-primary">Добавить товар</a>
+
+<div class="product-list">
+  {% for product in page_obj %}
+    <div class="product-card">
+      <h2>{{ product.name }}</h2>
+      <p>{{ product.description|truncatechars:100 }}</p>
+      <p>Цена: {{ product.price }}</p>
+      <a href="{% url 'catalog:product_detail' product.pk %}">Подробнее</a>
+
+      {% if perms.catalog.can_unpublish_product %}
+        <a href="{% url 'product_unpublish' product.pk %}">Снять с публикации</a>
+      {% endif %}
+
+      {% if product.owner == request.user or perms.catalog.delete_product %}
+        <a href="{% url 'product_delete' product.pk %}">Удалить</a>
+      {% endif %}
+
+      {% if product.owner == request.user %}
+        <a href="{% url 'product_edit' product.pk %}">Редактировать</a>
+      {% endif %}
+    </div>
+  {% empty %}
+    <p>Товаров пока нет.</p>
+  {% endfor %}
+</div>
+
+<div class="pagination">
+  {% if page_obj.has_previous %}
+    <a href="?page=1">Первая</a>
+    <a href="?page={{ page_obj.previous_page_number }}">Предыдущая</a>
+  {% endif %}
+
+  <span>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+
+  {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}">Следующая</a>
+    <a href="?page={{ page_obj.paginator.num_pages }}">Последняя</a>
+  {% endif %}
+</div>
+{% endblock %}
