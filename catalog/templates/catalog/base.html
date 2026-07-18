@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Каталог{% endblock %}</title>
+</head>
+<body>
+    <!-- Сюда будут выводиться сообщения (например, "Сообщение отправлено") -->
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li style="color: green; font-weight: bold;">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <h1>Мой Магазин</h1>
+    
+    <nav>
+        <a href="{% url 'home' %}">Главная</a> | 
+        <a href="{% url 'contacts' %}">Контакты</a>
+    </nav>
+
+    <hr>
+
+    <!-- Всё уникальное содержимое страницы будет здесь -->
+    {% block content %}{% endblock %}
+</body>
+</html>
