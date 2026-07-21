@@ -3,5 +3,5 @@ from django.urls import path, include  # <-- Важно: импортируем 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('catalog.urls')),  # <-- Все остальные страницы берем из приложения catalog
+    path('', include('catalog.urls')),  #
 ]
