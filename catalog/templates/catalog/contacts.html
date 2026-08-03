@@ -1,0 +1,111 @@
+{% extends 'catalog/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Контакты{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom box-shadow">
+    <h5 class="my-0 mr-md-auto font-weight-normal">Skystore</h5>
+    <nav class="ms-5">
+        <a class="p-2 btn btn-outline-primary" href="/">Каталог</a>
+        <a class="p-2 btn btn-outline-primary" href="/contacts/">Контакты</a>
+    </nav>
+</div>
+
+{% if messages %}
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+    {% for message in messages %}
+        {{ message }}
+    {% endfor %}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+{% endif %}
+
+<div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+    <h1 class="display-4">Контакты</h1>
+</div>
+
+<div class="container">
+    <div class="row text-start">
+        <div class="col-lg-9 col-md-6 col-sm-12">
+            <div class="card mb-4 box-shadow">
+                <div class="card-body">
+
+                    {% if contact_data %}
+                    <table class="table table-striped">
+                        <tr>
+                            <td class="w-25">Название</td>
+                            <td>{{ contact_data.name }}</td>
+                        </tr>
+                        <tr>
+                            <td class="w-25">Телефон</td>
+                            <td>{{ contact_data.phone|default:"—" }}</td>
+                        </tr>
+                        <tr>
+                            <td class="w-25">Email</td>
+                            <td>{{ contact_data.email|default:"—" }}</td>
+                        </tr>
+                        <tr>
+                            <td class="w-25">Адрес</td>
+                            <td>{{ contact_data.address|default:"—" }}</td>
+                        </tr>
+                        <tr>
+                            <td class="w-25">Часы работы</td>
+                            <td>{{ contact_data.working_hours|default:"—" }}</td>
+                        </tr>
+                    </table>
+                    {% else %}
+                    <p class="text-muted">Контактные данные пока не добавлены через админку.</p>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 col-sm-12">
+            <div class="card mb-4 box-shadow">
+                <div class="card-header">
+                    <h4 class="my-0 font-weight-normal">Свяжитесь с нами</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <button type="submit" class="btn btn-lg btn-block btn-outline-primary">Отправить</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="pt-4 my-md-5 pt-md-5 border-top">
+        <div class="row">
+            <div class="col-12 col-md">
+                SkyStore
+                <small class="d-block mb-3 text-muted">&copy; 2023</small>
+            </div>
+            <div class="col-6 col-md">
+                <h5>Категории</h5>
+                <ul class="list-unstyled text-small">
+                    <li><a class="text-muted" href="#">Рассылки</a></li>
+                    <li><a class="text-muted" href="#">Телеграм боты</a></li>
+                    <li><a class="text-muted" href="#">Полезные утилиты</a></li>
+                    <li><a class="text-muted" href="#">Веб-приложения</a></li>
+                    <li><a class="text-muted" href="#">Микросервисы</a></li>
+                </ul>
+            </div>
+            <div class="col-6 col-md">
+                <h5>Дополнительно</h5>
+                <ul class="list-unstyled text-small">
+                    <li><a class="text-muted" href="#">Мы пишем</a></li>
+                </ul>
+            </div>
+            <div class="col-6 col-md">
+                <h5>О нас</h5>
+                <ul class="list-unstyled text-small">
+                    <li><a class="text-muted" href="/contacts/">Контакты</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+</div>
+{% endblock %}
