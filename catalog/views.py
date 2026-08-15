@@ -1,52 +1,41 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.views.generic import DetailView, CreateView, ListView
-from .models import Product, Contact
-from .forms import ProductForm, ContactForm
+from django.core.paginator import Paginator
+from django.views.generic import CreateView
 from django.urls import reverse_lazy
-from .models import Contact
+from .forms import ContactForm, ProductForm  # ← добавлен ProductForm
+from .models import Product
+
 
 def home(request):
-    latest_products = Product.objects.order_by('-id')[:5]
-    print(list(latest_products))
-    return render(request, 'catalog/home.html', {
-        'latest_products': latest_products
-    })
+    products = Product.objects.all().order_by('-created_at')
+    paginator = Paginator(products, 6)
 
-def contacts_page(request):
-    contacts = Contact.objects.all()
-    print("В базе контактов:", contacts.count())  # ← смотрите в консоль
-    for c in contacts:
-        print(" -", c.name)
-    return render(request, 'catalog/contacts.html', {'contacts': contacts})
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'catalog/home.html', {'page_obj': page_obj})
+
 
 def contacts(request):
-    contact_data = Contact.objects.first()
-
-    if request.method == 'POST':
+    if request.method == "POST":
         form = ContactForm(request.POST)
         if form.is_valid():
-            # Здесь сохраните или отправьте
-            messages.success(request, 'Спасибо! Сообщение отправлено.')
-            return redirect('contacts')
+            messages.success(request, "Сообщение отправлено!")
+            return redirect("contacts")
     else:
         form = ContactForm()
 
-    return render(request, 'catalog/contacts.html', {
-        'form': form,
-        'contact_data': contact_data,
-    })
+    return render(request, 'catalog/contacts.html', {"form": form})
 
-class ProductDetailView(DetailView):
-    model = Product
-    template_name = 'catalog/product_detail.html'
-    context_object_name = 'product'
 
-class ProductListView(ListView):
-    model = Product
-    template_name = 'catalog/product_list.html'
-    context_object_name = 'products'
-    paginate_by = 10
+def product_detail(request, pk):
+    try:
+        product = Product.objects.get(pk=pk)
+    except Product.DoesNotExist:
+        messages.error(request, "Товар не найден")
+        return redirect('home')
+    return render(request, 'catalog/product_detail.html', {'product': product})
 
 class ProductCreateView(CreateView):
     model = Product
