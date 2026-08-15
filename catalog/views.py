@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.contrib.messages.views import SuccessMessageMixin
 from django.core.paginator import Paginator
 from django.views.generic import CreateView
 from django.urls import reverse_lazy
@@ -34,11 +35,12 @@ def product_detail(request, pk):
         product = Product.objects.get(pk=pk)
     except Product.DoesNotExist:
         messages.error(request, "Товар не найден")
-        return redirect('home')
+        return redirect('catalog:home')
     return render(request, 'catalog/product_detail.html', {'product': product})
 
-class ProductCreateView(CreateView):
+class ProductCreateView(SuccessMessageMixin, CreateView):
     model = Product
     form_class = ProductForm
     template_name = 'catalog/product_form.html'
-    success_url = reverse_lazy('product_list')
+    success_url = reverse_lazy('catalog:home')
+    success_message = "Товар «%(name)s» успешно добавлен!"
