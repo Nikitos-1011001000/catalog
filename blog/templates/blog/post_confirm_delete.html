@@ -1,11 +1,21 @@
 {% extends 'catalog/base.html' %}
 
-{% block content %}
-<h1>Удалить запись?</h1>
-<p>{{ object.title }}</p>
+{% block title %}Удаление записи{% endblock %}
 
-<form method="post">
-  {% csrf_token %}
-  <button type="submit">Да, удалить</button>
-</form>
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <h1>Удалить запись?</h1>
+            <p class="lead">Вы уверены, что хотите удалить «<strong>{{ object.title }}</strong>»?</p>
+            <p class="text-muted">Это действие нельзя отменить.</p>
+            
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Да, удалить</button>
+                <a href="{% url 'blogs:post_detail' post.pk %}" class="btn btn-outline-secondary">Отмена</a>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}

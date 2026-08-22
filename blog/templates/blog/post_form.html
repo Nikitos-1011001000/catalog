@@ -1,11 +1,20 @@
 {% extends 'catalog/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% if object %}Редактировать{% else %}Создать{% endif %} запись{% endblock %}
 
 {% block content %}
-<h1>Форма записи</h1>
-
-<form method="post" enctype="multipart/form-data">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Сохранить</button>
-</form>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1>{% if object %}Редактирование записи{% else %}Новая запись{% endif %}</h1>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+                <a href="{% url 'blogs:post_list' %}" class="btn btn-outline-secondary">Отмена</a>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}
