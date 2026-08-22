@@ -1,0 +1,11 @@
+{% extends 'catalog/base.html' %}
+
+{% block content %}
+<h1>Удалить запись?</h1>
+<p>{{ object.title }}</p>
+
+<form method="post">
+  {% csrf_token %}
+  <button type="submit">Да, удалить</button>
+</form>
+{% endblock %}
