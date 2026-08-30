@@ -5,4 +5,10 @@
 <p>{{ product.description }}</p>
 <p>Цена: {{ product.price }}</p>
 <p>Категория: {{ product.category }}</p>
+
+<div class="mt-4">
+	<a href="{% url 'catalog:product_update' product.pk %}" class="btn btn-warning">Изменить</a>
+        <a href="{% url 'catalog:product_delete' product.pk %}" class="btn btn-danger">Удалить</a>
+        <a href="{% url 'catalog:home' %}" class="btn btn-secondary">Назад</a>
+</div>
 {% endblock %}

@@ -1,8 +1,5 @@
 {% extends 'catalog/base.html' %}
-{% load crispy_forms_tags %}
-
 {% block title %}Контакты{% endblock %}
-
 {% block content %}
 <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom box-shadow">
     <h5 class="my-0 mr-md-auto font-weight-normal">Skystore</h5>
@@ -30,34 +27,20 @@
         <div class="col-lg-9 col-md-6 col-sm-12">
             <div class="card mb-4 box-shadow">
                 <div class="card-body">
-
-                    {% if contact_data %}
                     <table class="table table-striped">
                         <tr>
-                            <td class="w-25">Название</td>
-                            <td>{{ contact_data.name }}</td>
+                            <td class="w-25">Страна</td>
+                            <td>USA</td>
                         </tr>
                         <tr>
-                            <td class="w-25">Телефон</td>
-                            <td>{{ contact_data.phone|default:"—" }}</td>
-                        </tr>
-                        <tr>
-                            <td class="w-25">Email</td>
-                            <td>{{ contact_data.email|default:"—" }}</td>
+                            <td class="w-25">ИНН</td>
+                            <td>91-1144442</td>
                         </tr>
                         <tr>
                             <td class="w-25">Адрес</td>
-                            <td>{{ contact_data.address|default:"—" }}</td>
-                        </tr>
-                        <tr>
-                            <td class="w-25">Часы работы</td>
-                            <td>{{ contact_data.working_hours|default:"—" }}</td>
+                            <td>Redmond,WA,98052-6399</td>
                         </tr>
                     </table>
-                    {% else %}
-                    <p class="text-muted">Контактные данные пока не добавлены через админку.</p>
-                    {% endif %}
-
                 </div>
             </div>
         </div>
@@ -69,6 +52,7 @@
                 <div class="card-body">
                     <form method="post">
                         {% csrf_token %}
+                        {% load crispy_forms_tags %}
                         {{ form|crispy }}
                         <button type="submit" class="btn btn-lg btn-block btn-outline-primary">Отправить</button>
                     </form>

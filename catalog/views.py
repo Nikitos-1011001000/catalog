@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.paginator import Paginator
-from django.views.generic import ListView, FormView, DetailView, CreateView
+from django.views.generic import ListView, FormView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from .forms import ContactForm, ProductForm
 from .models import Product
@@ -56,3 +56,25 @@ class ProductCreateView(SuccessMessageMixin, CreateView):
     template_name = 'catalog/product_form.html'
     success_url = reverse_lazy('catalog:home')
     success_message = "Товар «%(name)s» успешно добавлен!"
+
+class ProductUpdateView(SuccessMessageMixin, UpdateView):
+    """Обновление товара."""
+    model = Product
+    form_class = ProductForm
+    template_name = 'catalog/product_form.html'
+    success_url = reverse_lazy('catalog:home')
+    success_message = "Товар «%(name)s» успешно обновлён!"
+
+
+class ProductDeleteView(SuccessMessageMixin, DeleteView):
+    """Удаление товара."""
+    model = Product
+    template_name = 'catalog/product_confirm_delete.html'
+    success_url = reverse_lazy('catalog:home')
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        name = self.object.name  # ← сохраняем имя ДО удаления
+        messages.success(self.request, f'Товар «{name}» удалён.')
+        return super().delete(request, *args, **kwargs)
+
