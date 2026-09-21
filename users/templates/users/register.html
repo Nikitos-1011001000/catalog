@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'catalog/base.html' %}
 
 {% block content %}
 <h2>Регистрация</h2>
@@ -7,5 +7,5 @@
   {{ form.as_p }}
   <button type="submit">Зарегистрироваться</button>
 </form>
-<p><a href="{% url 'login' %}">Уже есть аккаунт? Войти</a></p>
+<p><a href="{% url 'users:login' %}">Уже есть аккаунт? Войти</a></p>
 {% endblock %}

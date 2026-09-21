@@ -74,18 +74,33 @@ TEMPLATES = [
     },
 ]
 
-CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
-CRISPY_TEMPLATE_PACK = "bootstrap5"
-
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'blog@skystore.local'
 ADMIN_EMAIL = 'walfisch91@gmail.com'
+ADMINS = [('Admin', ADMIN_EMAIL)]
+MANAGERS = ADMINS
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+# Режим разработки: письма падают в консоль (терминал runserver)
+# Режим продакшена: письма уходят на реальный SMTP
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    DEFAULT_FROM_EMAIL = 'noreply@skystore.local'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = 'smtp.yandex.ru'           # <-- замените на свой почтовый сервер
+    EMAIL_PORT = 465
+    EMAIL_USE_SSL = True
+    # EMAIL_USE_TLS = True                  # раскомментируйте, если порт 587
+    # EMAIL_PORT = 587
+
+    EMAIL_HOST_USER = 'blog@skystore.local' # <-- ваша РЕАЛЬНАЯ почта
+    EMAIL_HOST_PASSWORD = 'пароль_приложения'  # <-- пароль приложения, не обычный!
+
+    DEFAULT_FROM_EMAIL = EMAIL_HOST_USER    # отправитель = ваша почта (обязательно!)
+    SERVER_EMAIL = EMAIL_HOST_USER 
 
 
 print("=" * 50)
 print("BASE_DIR:", BASE_DIR)
 print("STATICFILES_DIRS:", STATICFILES_DIRS)
 print("=" * 50)
+
+LOGIN_REDIRECT_URL = '/'
