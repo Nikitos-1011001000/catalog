@@ -7,8 +7,37 @@
 <p>Категория: {{ product.category }}</p>
 
 <div class="mt-4">
-	<a href="{% url 'catalog:product_update' product.pk %}" class="btn btn-warning">Изменить</a>
-        <a href="{% url 'catalog:product_delete' product.pk %}" class="btn btn-danger">Удалить</a>
-        <a href="{% url 'catalog:home' %}" class="btn btn-secondary">Назад</a>
+
+    {% if user == product.owner or perms.catalog.change_product %}
+            
+        <a href="{% url 'catalog:product_update' product.pk %}"
+           class="btn btn-primary">
+            Изменить
+        </a>
+    {% endif %}
+
+    {% if user == product.owner or perms.catalog.delete_product %}
+        <a href="{% url 'catalog:product_delete' product.pk %}"
+           class="btn btn-danger">
+            Удалить
+        </a>
+    {% endif %}
+
+    {% if product.is_published and perms.catalog.can_unpublish_product %}
+        <form method="post"
+              action="{% url 'catalog:product_unpublish' product.pk %}"
+              class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-dark">
+                Отменить публикацию
+            </button>
+        </form>
+    {% endif %}
+
+    <a href="{% url 'catalog:home' %}"
+       class="btn btn-secondary">
+        Назад
+    </a>
+
 </div>
 {% endblock %}

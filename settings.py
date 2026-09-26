@@ -24,6 +24,8 @@ INSTALLED_APPS = [
     'users',
 ]
 
+CRISPY_TEMPLATE_PACK = 'bootstrap5'
+
 AUTH_USER_MODEL = "users.User"
 
 MIDDLEWARE = [
@@ -103,4 +105,5 @@ print("BASE_DIR:", BASE_DIR)
 print("STATICFILES_DIRS:", STATICFILES_DIRS)
 print("=" * 50)
 
-LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = 'users:login'
+LOGIN_REDIRECT_URL = 'catalog:home'

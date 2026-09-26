@@ -1,9 +1,16 @@
 from django.db import models
-
+from django.conf import settings
 
 class Category(models.Model):
-    name = models.CharField(max_length=100, verbose_name='Наименование')
-    description = models.TextField(blank=True, null=True, verbose_name='Описание')
+    name = models.CharField(
+        max_length=100,
+        verbose_name='Наименование'
+    )
+    description = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name='Описание'
+    )
 
     def __str__(self):
         return self.name
@@ -22,12 +29,33 @@ class Product(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата последнего изменения')
 
+    is_published = models.BooleanField(
+        default=False,
+        verbose_name='Опубликован'
+    )
+
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        verbose_name='Владелец',
+        blank=True,
+        null=True,
+        related_name='products'
+    )
+
     def __str__(self):
         return self.name
 
     class Meta:
         verbose_name = 'Продукт'
         verbose_name_plural = 'Продукты'
+
+        permissions = [
+            (
+                'can_unpublish_product',
+                'Can unpublish product',
+            ),
+        ]
 
 class Contact(models.Model):
     name = models.CharField('Имя', max_length=200)

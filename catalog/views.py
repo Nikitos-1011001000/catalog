@@ -1,7 +1,13 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages
+from django.contrib.auth.mixins import (
+    LoginRequiredMixin,
+    UserPassesTestMixin,
+    PermissionRequiredMixin,
+)
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.paginator import Paginator
+from django.views import View
 from django.views.generic import ListView, FormView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from .forms import ContactForm, ProductForm
@@ -49,7 +55,11 @@ class ProductDetailView(DetailView):
         return self.render_to_response(context)
 
 
-class ProductCreateView(SuccessMessageMixin, CreateView):
+class ProductCreateView(
+    LoginRequiredMixin,
+    SuccessMessageMixin,
+    CreateView
+):
     """Уже CBV — не трогаем."""
     model = Product
     form_class = ProductForm
@@ -57,7 +67,16 @@ class ProductCreateView(SuccessMessageMixin, CreateView):
     success_url = reverse_lazy('catalog:home')
     success_message = "Товар «%(name)s» успешно добавлен!"
 
-class ProductUpdateView(SuccessMessageMixin, UpdateView):
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
+
+class ProductUpdateView(
+    LoginRequiredMixin,
+    UserPassesTestMixin,
+    SuccessMessageMixin,
+    UpdateView
+):
     """Обновление товара."""
     model = Product
     form_class = ProductForm
@@ -65,16 +84,69 @@ class ProductUpdateView(SuccessMessageMixin, UpdateView):
     success_url = reverse_lazy('catalog:home')
     success_message = "Товар «%(name)s» успешно обновлён!"
 
+    def test_func(self):
+        product = self.get_object()
 
-class ProductDeleteView(SuccessMessageMixin, DeleteView):
+        is_owner = product.owner == self.request.user
+
+        is_moderator = self.request.user.has_perm(
+            'catalog.change_product'
+        )
+
+        return is_owner or is_moderator
+
+
+class ProductDeleteView(
+    LoginRequiredMixin,
+    UserPassesTestMixin,
+    SuccessMessageMixin,
+    DeleteView
+):
     """Удаление товара."""
     model = Product
     template_name = 'catalog/product_confirm_delete.html'
     success_url = reverse_lazy('catalog:home')
 
+    def test_func(self):
+        product = self.get_object()
+
+        is_owner = product.owner == self.request.user
+        is_moderator = self.request.user.has_perm(
+            'catalog.delete_product'
+        )
+
+        return is_owner or is_moderator
+
     def delete(self, request, *args, **kwargs):
         self.object = self.get_object()
-        name = self.object.name  # ← сохраняем имя ДО удаления
-        messages.success(self.request, f'Товар «{name}» удалён.')
+        name = self.object.name
+
+        messages.success(
+            self.request,
+            f'Товар «{name}» удалён.'
+        )
+
         return super().delete(request, *args, **kwargs)
+
+
+class ProductUnpublishView(
+    LoginRequiredMixin,
+    PermissionRequiredMixin,
+    View
+):
+    """Отмена публикации доступна только модератору."""
+    permission_required = 'catalog.can_unpublish_product'
+
+    def post(self, request, pk):
+        product = get_object_or_404(Product, pk=pk)
+
+        product.is_published = False
+        product.save()
+
+        messages.success(
+            request,
+            f'Публикация товара «{product.name}» отменена.'
+        )
+
+        return redirect('catalog:home')
 
