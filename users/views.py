@@ -13,7 +13,7 @@ class ProfileEditView(LoginRequiredMixin, UpdateView):
     template_name = 'users/profile_edit.html'
     form_class = ProfileUpdateForm
     model = User
-    success_url = reverse_lazy('home')  # Используем reverse_lazy для динамического URL
+    success_url = reverse_lazy('catalog:home')  # Используем reverse_lazy для динамического URL
 
     def get_object(self, queryset=None):
         return self.request.user

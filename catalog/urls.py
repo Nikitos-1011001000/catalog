@@ -1,4 +1,5 @@
 from django.urls import path
+from . import views
 from .views import (
     HomeView,
     ContactsView,
@@ -22,5 +23,10 @@ urlpatterns = [
         'product/<int:pk>/unpublish/',
         ProductUnpublishView.as_view(),
         name='product_unpublish',
+    ),
+    path(
+        'category/<int:category_id>/',
+        views.products_by_category,
+        name='products_by_category',
     ),
 ]

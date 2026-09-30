@@ -1,0 +1,51 @@
+{% extends 'catalog/base.html' %}
+
+{% block content %}
+    <div class="container py-4">
+        <h1 class="mb-4">
+            Товары категории: {{ category.name }}
+        </h1>
+
+        {% if products %}
+            <div class="row">
+                {% for product in products %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    {{ product.name }}
+                                </h5>
+
+                                <p class="card-text">
+                                    {{ product.description|truncatechars:100 }}
+                                </p>
+
+                                <p class="card-text">
+                                    <strong>
+                                        {{ product.price }} руб.
+                                    </strong>
+                                </p>
+
+                                <a
+                                    class="btn btn-primary"
+                                    href="{% url 'catalog:product_detail' product.pk %}"
+                                >
+                                    Подробнее
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>В этой категории пока нет товаров.</p>
+        {% endif %}
+
+        <a
+            class="btn btn-outline-secondary mt-3"
+            href="{% url 'catalog:home' %}"
+        >
+            Вернуться на главную
+        </a>
+    </div>
+{% endblock %}
